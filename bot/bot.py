@@ -9,6 +9,7 @@ BOT_TOKEN - @BotFather'dan olinadi
 WEBAPP_URL - Mini App joylashtirilgan HTTPS manzil (masalan, Render'da hosting qilingandan keyin)
 """
 
+import asyncio
 import os
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from telegram.ext import Application, CommandHandler, ContextTypes
@@ -51,6 +52,10 @@ def main():
     app = Application.builder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_cmd))
+
+    # Python 3.14 fix: asyncio.get_event_loop() endi avtomatik loop yaratmaydi.
+    # Shu joriy event loop'ni qo'lda o'rnatamiz.
+    asyncio.set_event_loop(asyncio.new_event_loop())
 
     print("Bot ishga tushdi...")
     app.run_polling()
