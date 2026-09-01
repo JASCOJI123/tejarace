@@ -10,3 +10,17 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /api/health
+
+  # Telegram bot — 24/7 ishlashi uchun bu servisni paid (Starter) plan'ga
+  # ko'taring; aks holda Render bepul tier uni uxlatib qo'yadi.
+  - type: worker
+    name: teja-race-bot
+    runtime: python
+    rootDir: bot
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: WEBAPP_URL
+        sync: false
