@@ -9,16 +9,27 @@ Endpoints:
   GET  /api/profile/{user_id}  -> a driver's own stats + rank
 """
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import sqlite3
 import os
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "teja_race.db")
+BASE_DIR = os.path.dirname(__file__)
+DB_PATH = os.path.join(BASE_DIR, "teja_race.db")
+WEBAPP_PATH = os.path.abspath(os.path.join(BASE_DIR, "..", "webapp", "index.html"))
 
-app = FastAPI(title="TEJA RACE API")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
+
+
+app = FastAPI(title="TEJA RACE API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -77,11 +88,6 @@ class FuelEntryIn(BaseModel):
     amount_sum: float | None = None
 
 
-@app.on_event("startup")
-def _startup():
-    init_db()
-
-
 @app.post("/api/user/register")
 def register_user(payload: RegisterIn):
     conn = get_db()
@@ -101,7 +107,7 @@ def register_user(payload: RegisterIn):
             payload.city,
             payload.car_model,
             payload.baseline_lp100,
-            datetime.utcnow().isoformat(),
+            datetime.now(timezone.utc).isoformat(),
         ),
     )
     conn.commit()
@@ -132,7 +138,7 @@ def add_fuel_entry(payload: FuelEntryIn):
             payload.liters,
             payload.distance_km,
             payload.amount_sum,
-            datetime.utcnow().isoformat(),
+            datetime.now(timezone.utc).isoformat(),
         ),
     )
     conn.commit()
@@ -144,7 +150,7 @@ def add_fuel_entry(payload: FuelEntryIn):
 
 
 def _week_start_iso():
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     monday = now - timedelta(days=now.weekday())
     return monday.strftime("%Y-%m-%dT00:00:00")
 
@@ -227,6 +233,12 @@ def profile(user_id: int):
     }
 
 
-@app.get("/")
+@app.get("/", include_in_schema=False)
+def serve_mini_app():
+    """Telegram Mini App (webapp/index.html) shu origin'dan xizmat qiladi."""
+    return FileResponse(WEBAPP_PATH)
+
+
+@app.get("/api/health")
 def health():
     return {"status": "TEJA RACE API ishlayapti"}

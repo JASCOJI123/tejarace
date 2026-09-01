@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+
+# Runtime ma'lumotlar
+backend/teja_race.db
+
+# Secret'lar
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Mahalliy dev konfiguratsiyalari
+.claude/

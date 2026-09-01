@@ -243,8 +243,10 @@
 </div>
 
 <script>
-  // ---- SOZLAMALAR: backend joylashtirilgandan keyin shu manzilni o'zgartiring ----
-  const API_BASE = "http://127.0.0.1:8811"; // masalan: https://teja-race-api.onrender.com
+  // ---- SOZLAMALAR ----
+  // Mini App backend'dan (bir xil origin) xizmat qilingani uchun
+  // API ham o'sha manzil orqali ishlaydi — alohida sozlash shart emas.
+  const API_BASE = location.origin;
 
   const tg = window.Telegram?.WebApp;
   if (tg) { tg.ready(); tg.expand(); }

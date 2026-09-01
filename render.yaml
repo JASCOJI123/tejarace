@@ -1,0 +1,12 @@
+# Render Blueprint — TEJA RACE
+# Ushbu fayl Render'dagi web service'ni avtomatik sozlaydi.
+# GitHub repo'ni Render'ga bog'laganingizda ushbu sozlamalar qo'llanadi.
+services:
+  - type: web
+    name: teja-race
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
